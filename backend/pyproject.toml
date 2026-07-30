@@ -1,0 +1,104 @@
+[project]
+name = "raglens-backend"
+version = "0.0.1"
+description = "RagLens backend: trace ingest, query, attribution, eval, and experiment APIs."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Zhihao Bai" }]
+dependencies = [
+    # Web framework
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "sse-starlette>=2.1.3",
+    "python-multipart>=0.0.12",
+    # Data models
+    "pydantic>=2.9.2",
+    "pydantic-settings>=2.5.2",
+    # PostgreSQL (metadata)
+    "sqlalchemy[asyncio]>=2.0.35",
+    "psycopg[binary,pool]>=3.2.3",
+    "alembic>=1.13.3",
+    # ClickHouse (traces / events)
+    "asynch>=0.2.4",
+    "clickhouse-driver>=0.2.9",
+    # Redis (ingest streams + cache)
+    "redis>=5.1.0",
+    # Vector store (W7+)
+    "qdrant-client>=1.11.2",
+    # Numeric / ML (W8: UMAP, W9: eval)
+    "numpy>=1.26.4",
+    "scikit-learn>=1.5.2",
+    "umap-learn>=0.5.6",
+    # LLM SDKs (W9: eval judge)
+    "anthropic>=0.36.0",
+    "openai>=1.51.0",
+    # Utilities
+    "tenacity>=9.0.0",
+    "httpx>=0.27.2",
+    "structlog>=24.4.0",
+    "slowapi>=0.1.9",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.3",
+    "pytest-asyncio>=0.24.0",
+    "pytest-cov>=5.0.0",
+    "testcontainers[postgres,redis]>=4.8.2",
+    "ruff>=0.6.9",
+    "black>=24.10.0",
+    "mypy>=1.11.2",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+# ---------------------------------------------------------------------------
+# Ruff (lint + import sort)
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W",   # pycodestyle + pyflakes
+    "I",              # isort
+    "B",              # bugbear
+    "UP",             # pyupgrade
+    "SIM",            # simplify
+    "RUF",            # ruff-native
+    "ASYNC",          # async best practices
+]
+ignore = ["E501"]     # line length handled by black
+
+# ---------------------------------------------------------------------------
+# Black
+# ---------------------------------------------------------------------------
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+# ---------------------------------------------------------------------------
+# Mypy (strict for new code)
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+plugins = ["pydantic.mypy"]
+
+# ---------------------------------------------------------------------------
+# Pytest
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+addopts = "-ra --strict-markers --strict-config"
+testpaths = ["tests"]
