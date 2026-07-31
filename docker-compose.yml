@@ -4,7 +4,9 @@
 
 services:
   clickhouse:
-    image: clickhouse/clickhouse-server:24-alpine
+    # Note: -alpine variants have known jemalloc/lz4 issues on Apple Silicon;
+    # use the debian-based image for stable arm64 support.
+    image: clickhouse/clickhouse-server:24.8
     container_name: raglens-clickhouse
     restart: unless-stopped
     ports:
@@ -24,11 +26,12 @@ services:
       CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-raglens}
       CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--spider", "http://localhost:8123/ping"]
+      # /ping returns "Ok.\n" with 200. debian image has curl available.
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:8123/ping || exit 1"]
       interval: 5s
       timeout: 3s
-      retries: 20
-      start_period: 10s
+      retries: 30
+      start_period: 30s
 
   postgres:
     image: postgres:16-alpine
@@ -127,11 +130,13 @@ services:
       backend:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --spider http://localhost:3000 || exit 1"]
+      # Use node's built-in http client — no wget/curl needed, works on alpine
+      # and matches the user (nextjs) that runs the server.
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3000', r => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))"]
       interval: 10s
       timeout: 5s
-      retries: 10
-      start_period: 20s
+      retries: 15
+      start_period: 30s
 
 volumes:
   clickhouse_data:
