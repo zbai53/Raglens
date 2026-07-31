@@ -19,8 +19,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy project metadata first for better layer caching
-COPY pyproject.toml uv.lock* ./
+# Copy project metadata first for better layer caching.
+# README.md is required by hatchling for the `readme` metadata field.
+COPY pyproject.toml uv.lock* README.md ./
 
 # Install ONLY production deps into /app/.venv
 RUN --mount=type=cache,target=/root/.cache/uv \

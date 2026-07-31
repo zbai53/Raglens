@@ -8,3 +8,4 @@ tests/
 .env
 .env.local
 *.md
+!README.md
