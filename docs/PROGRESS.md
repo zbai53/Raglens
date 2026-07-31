@@ -70,13 +70,16 @@
 - [x] [docs] `ARCHITECTURE.md` placeholder mirroring the project knowledge doc
 
 **Not done / blocked**:
-- [ ] `frontend/` real Next.js scaffold — deferred to when bai runs `pnpm create next-app` (see `frontend/SETUP.md`); Dockerfile is ready
-- [ ] `docker compose up -d` end-to-end verification — needs frontend scaffold + first `uv sync` in backend
 - [ ] CI (GitHub Actions) — moved to D2 (does not block D2 data-model work)
 
 **Pitfalls encountered**:
-- macOS Finder blocked dragging a dot-file (`.gitignore`) → resolved via `⌘+Shift+.` toggle, but afterwards discovered the committed `.gitignore` was still GitHub's default Python-only template (README got overwritten, .gitignore did not) → fixed by writing full monorepo version and committing separately.
-- `git commit` errored on `.git/index.lock` — a background git process had crashed / been interrupted → `rm .git/index.lock` and retry.
+- **macOS Finder blocks dragging dot-files** — `.gitignore` didn't drag in; fixed with `⌘+Shift+.` to show hidden files. Also discovered committed `.gitignore` was still GitHub's default Python-only template (README overwrote, .gitignore didn't). Fixed by rewriting the full monorepo version.
+- **`.git/index.lock` reappeared after every commit** — cause: an IDE/GUI (VS Code / Fork / Warp starship prompt) was auto-running `git status` in the background and racing with terminal git. Workaround: `rm -f .git/index.lock` before commit. Real fix: disable auto-fetch in IDE for high-frequency commit workflows.
+- **hatchling + docker `.dockerignore *.md` collision** — hatchling validates the `readme` metadata field during `build_editable` by opening `README.md`. If `.dockerignore` excludes it, the whole `uv sync` chain fails cryptically ("Failed to fetch wheel: raglens-backend @ file:///app"). Fix: `!README.md` exception + explicit `COPY README.md` in Dockerfile. **Interview point**: PEP 517 build isolation runs in a tempdir that only sees files declared in the source tree — this is how you learn *what* your `pyproject.toml` actually depends on.
+- **`create-next-app@14.2` no longer scaffolds `public/`** when the directory would be empty; Dockerfile `COPY /app/public` then fails cache-key computation. Fix: `public/.gitkeep`.
+- **`clickhouse/clickhouse-server:24-alpine` unhealthy on Apple Silicon** — the `-alpine` variant has musl/jemalloc/lz4 issues on arm64. Fix: switch to debian-based `clickhouse/clickhouse-server:24.8`. Also wiped stale volume (`docker volume rm raglens_clickhouse_data raglens_clickhouse_logs`) before restart. **Interview point**: when picking DB images for local dev, alpine ≠ automatically smaller/better; jemalloc-based systems (ClickHouse, MongoDB, ScyllaDB) tend to be more stable on glibc.
+- **frontend healthcheck failed but service was actually ready** — used `wget --spider` on node:20-alpine; BusyBox wget's exit code semantics disagreed with health-check assumptions. Fix: switch to node built-in `require('http').get()` — no external tool needed, uses the same runtime as the app, and works uniformly across alpine/debian.
+- **`SHOW DATABASES` returned "Authentication failed"** — when compose sets `CLICKHOUSE_USER=raglens`, the `default` user is disabled. `curl` without `-u raglens:raglens` hits the default user and fails. Not a bug, but easy to mistake for one during verification.
 
 **Decisions**:
 - **Python packaging**: `uv` for both backend and SDK (chosen over pip-tools + requirements.txt). Rationale: 10-100× faster resolve/install, single-file `uv.lock`, and it's a legit interview talking point about modern tooling.
@@ -85,9 +88,15 @@
 - **License**: Apache 2.0 (matches Langfuse/LangSmith positioning; permissive enough for enterprise adoption).
 - **Repo visibility**: public from day 1 (start accruing baseline star history early; nothing sensitive in a scaffold).
 
+**Verified end-to-end** (D1 acceptance):
+- `docker compose ps` → all 6 services healthy
+- `curl localhost:8000/health` → `{"status":"ok","version":"0.0.1"}`
+- `curl -u raglens:raglens "localhost:8123/?query=SHOW+DATABASES"` → includes `raglens`
+- `curl -sI localhost:3000` → `HTTP/1.1 200 OK`
+- `curl localhost:8000/docs` → Swagger HTML
+
 **Next**:
-- W1 D2 — Alembic + PostgreSQL models (Project, Dataset, EvalRun, Experiment) + all Pydantic schemas
-- Before D2: run `frontend/SETUP.md` steps, `docker compose up -d`, verify 6 services healthy
+- W1 D2 — Alembic + PostgreSQL models (Project, Dataset, EvalRun, Experiment) + all Pydantic schemas + Swagger showing all schema definitions
 
 **Commits**:
 - `1e37504  chore(repo): initial scaffold with vision README, Apache-2.0, and monorepo .gitignore`
@@ -97,6 +106,10 @@
 - `cead796  feat(sdk): v0.0.1 skeleton — hatchling, httpx+pydantic deps only`
 - `07da18a  chore(frontend): Dockerfile for Next 14 standalone + SETUP.md bootstrap`
 - `7444a6b  docs: PROGRESS.md D1 log, ARCHITECTURE.md placeholder, subdir READMEs`
+- `_______  feat(frontend): Next.js 14 scaffold with Tailwind, shadcn/ui (Radix), and RagLens deps`
+- `_______  fix(backend): allow README.md in docker build (hatchling requires readme file to exist)`
+- `_______  fix(frontend): add public/ dir (create-next-app 14.2 skips it when empty)`
+- `_______  fix(infra): use debian ClickHouse image on arm64, switch frontend healthcheck to node http`
 
 ---
 
