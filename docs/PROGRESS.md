@@ -105,11 +105,12 @@
 - `fbb100b  feat(backend): FastAPI /health skeleton, uv pyproject, multi-stage Dockerfile`
 - `cead796  feat(sdk): v0.0.1 skeleton — hatchling, httpx+pydantic deps only`
 - `07da18a  chore(frontend): Dockerfile for Next 14 standalone + SETUP.md bootstrap`
-- `7444a6b  docs: PROGRESS.md D1 log, ARCHITECTURE.md placeholder, subdir READMEs`
-- `_______  feat(frontend): Next.js 14 scaffold with Tailwind, shadcn/ui (Radix), and RagLens deps`
-- `_______  fix(backend): allow README.md in docker build (hatchling requires readme file to exist)`
-- `_______  fix(frontend): add public/ dir (create-next-app 14.2 skips it when empty)`
-- `_______  fix(infra): use debian ClickHouse image on arm64, switch frontend healthcheck to node http`
+- `10d927e  docs: PROGRESS.md D1 log, ARCHITECTURE.md placeholder, subdir READMEs`
+- `3f218a7  feat(frontend): Next.js 14 scaffold with Tailwind, shadcn/ui (Radix), and RagLens deps (zustand/tanstack/d3/reactflow/recharts)`
+- `adf52e8  fix(backend): allow README.md in docker build (hatchling requires readme file to exist)`
+- `b3d9373  fix(frontend): add public/ dir (create-next-app 14.2 skips it when empty)`
+- `793b6ee  fix(infra): use debian ClickHouse image on arm64, switch frontend healthcheck to node http`
+- `bf97f36  docs: PROGRESS.md D1 completion — 6 pitfalls, D1 acceptance verified`
 
 ---
 
