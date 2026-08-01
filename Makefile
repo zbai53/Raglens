@@ -55,6 +55,21 @@ backend-test:  ## Run backend pytest
 backend-run:  ## Run backend locally (uvicorn)
 	cd backend && uv run uvicorn app.main:app --reload --port 8000
 
+backend-migrate:  ## Apply all pending alembic migrations (upgrade head)
+	cd backend && uv run alembic upgrade head
+
+backend-migrate-down:  ## Rollback last alembic migration
+	cd backend && uv run alembic downgrade -1
+
+backend-revision:  ## Autogenerate a new migration. Usage: make backend-revision m="add xyz"
+	cd backend && uv run alembic revision --autogenerate -m "$(m)"
+
+backend-current:  ## Show current alembic revision
+	cd backend && uv run alembic current
+
+backend-history:  ## List all alembic revisions
+	cd backend && uv run alembic history
+
 # ---------------------------------------------------------------------------
 # SDK
 # ---------------------------------------------------------------------------
