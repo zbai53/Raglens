@@ -1,0 +1,12 @@
+Alembic migrations for RagLens backend (async, psycopg 3).
+
+Common commands (run from backend/):
+
+    uv run alembic revision --autogenerate -m "your change"   # generate
+    uv run alembic upgrade head                               # apply
+    uv run alembic downgrade -1                               # rollback 1
+    uv run alembic history                                    # list revisions
+    uv run alembic current                                    # show current rev
+
+Autogenerate looks at app.models — every model must be re-exported from
+app/models/__init__.py or Alembic won't see it.
