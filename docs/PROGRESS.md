@@ -98,16 +98,14 @@
 **Next**:
 - W1 D3 — ClickHouse DDL (traces + events + hourly MV, TTL 90d, tokenbf indexes) + Storage layer (ClickHouseStorage, PostgresStorage, RedisStorage) + testcontainers-based storage tests
 
-**Commits** (fill in after committing):
-- `_______  feat(backend): Settings via pydantic-settings, computed database_url/redis_url`
-- `_______  feat(backend): SQLAlchemy 2.0 async base with strict naming convention + TimestampMixin`
-- `_______  feat(backend): 4 PG models — Project/Dataset/EvalRun/Experiment with JSONB and Enum status`
-- `_______  feat(backend): alembic async scaffold + initial migration (5 tables, 6 indexes)`
-- `_______  feat(backend): Pydantic schemas — trace/project/dataset/attribution/experiment with OpenAPI descriptions`
-- `_______  feat(backend): stub routes in main.py so Swagger surfaces D2 schemas`
-- `_______  test(backend): 15 schema smoke tests — bounds, extra-forbid, enum locks, ORM from_attributes`
-- `_______  chore(backend): pin Python 3.11 via .python-version + requires-python upper bound (avoid umap/llvmlite breakage on 3.12)`
-- `_______  chore(infra): Makefile alembic targets + Dockerfile COPY alembic.ini/migrations`
+**Commits**:
+- `b6a4e33  feat(backend): pydantic-settings Settings + Pydantic schemas (trace/project/dataset/attribution/experiment) + stub routes so Swagger surfaces them`
+- `c0a8d54  feat(backend): SQLAlchemy 2.0 async base + 4 PG models with strict naming convention (pk_/fk_/ix_)`
+- `848a333  feat(backend): alembic async scaffold + initial migration (5 tables, 6 indexes)`
+- `e165388  test(backend): 15 schema smoke tests — bounds, extra-forbid, enum locks, from_attributes`
+- `2c89171  chore(backend): pin Python 3.11 (avoid llvmlite/umap breakage on 3.12), add uv.lock`
+- `7238a6d  chore(infra): Makefile alembic targets + Dockerfile COPY alembic.ini/migrations`
+- `86e7713  docs: PROGRESS.md D2 log — 6 pitfalls, 6 decisions, D2 verified`
 
 ---
 
