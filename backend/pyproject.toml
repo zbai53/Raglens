@@ -3,7 +3,7 @@ name = "raglens-backend"
 version = "0.0.1"
 description = "RagLens backend: trace ingest, query, attribution, eval, and experiment APIs."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.12"
 license = { text = "Apache-2.0" }
 authors = [{ name = "Zhihao Bai" }]
 dependencies = [
